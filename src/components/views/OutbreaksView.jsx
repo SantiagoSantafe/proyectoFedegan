@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Map from '../common/Map';
-import Chart from '../common/Chart';
+import EnhancedMap from '../common/EnhancedMap';
+import EnhancedChart from '../common/EnhancedChart';
 import { outbreaksData } from '../../data/mockData';
 
 const OutbreaksView = () => {
@@ -77,18 +77,45 @@ const OutbreaksView = () => {
     
     // Datos por estado
     const byStatus = filteredData.reduce((acc, curr) => {
-      const status = curr.status;
+      const status = curr.status === 'active' ? 'Activo' : 
+                     curr.status === 'controlled' ? 'Controlado' : 'Erradicado';
       if (!acc[status]) acc[status] = 0;
       acc[status] += 1;
       return acc;
     }, {});
     
+    // Datos por región
+    const byRegion = filteredData.reduce((acc, curr) => {
+      const region = curr.region;
+      if (!acc[region]) acc[region] = 0;
+      acc[region] += curr.affectedAnimals;
+      return acc;
+    }, {});
+    
+    // Datos por severidad
+    const bySeverity = filteredData.reduce((acc, curr) => {
+      const severity = curr.severity === 'alta' ? 'Alta' : 
+                       curr.severity === 'media' ? 'Media' : 'Baja';
+      if (!acc[severity]) acc[severity] = 0;
+      acc[severity] += curr.affectedAnimals;
+      return acc;
+    }, {});
+    
+    // Datos de evolución para todos los brotes activos
+    const activeOutbreaks = filteredData.filter(o => o.status === 'active');
+    const progressData = activeOutbreaks.length > 0 ? 
+      activeOutbreaks[0].progress.map(entry => ({
+        date: entry.date,
+        value: entry.totalCases,
+        name: 'Casos Totales'
+      })) : [];
+    
     return {
       byDisease: Object.entries(byDisease).map(([name, value]) => ({ name, value })),
-      byStatus: Object.entries(byStatus).map(([name, value]) => ({
-        name: name === 'active' ? 'Activo' : name === 'controlled' ? 'Controlado' : 'Erradicado',
-        value
-      }))
+      byStatus: Object.entries(byStatus).map(([name, value]) => ({ name, value })),
+      byRegion: Object.entries(byRegion).map(([name, value]) => ({ name, value })),
+      bySeverity: Object.entries(bySeverity).map(([name, value]) => ({ name, value })),
+      progressData
     };
   };
   
@@ -182,41 +209,71 @@ const OutbreaksView = () => {
         </div>
         <div className="summary-item">
           <span className="summary-label">Activos:</span>
-          <span className="summary-value">{filteredData.filter(o => o.status === 'active').length}</span>
+          <span className="summary-value alert">{filteredData.filter(o => o.status === 'active').length}</span>
         </div>
         <div className="summary-item">
           <span className="summary-label">Controlados:</span>
-          <span className="summary-value">{filteredData.filter(o => o.status === 'controlled').length}</span>
+          <span className="summary-value warning">{filteredData.filter(o => o.status === 'controlled').length}</span>
         </div>
         <div className="summary-item">
           <span className="summary-label">Erradicados:</span>
-          <span className="summary-value">{filteredData.filter(o => o.status === 'eradicated').length}</span>
+          <span className="summary-value success">{filteredData.filter(o => o.status === 'eradicated').length}</span>
         </div>
       </div>
       
-      <div className="outbreak-main">
-        <div className="map-section">
-          <Map 
-            markers={getMapMarkers()} 
-            title="Mapa de Brotes Sanitarios"
+      {/* Mapa Principal */}
+      <EnhancedMap 
+        markers={getMapMarkers()} 
+        title="Mapa de Brotes Sanitarios"
+        center={[4.570868, -74.297333]}
+        zoom={6}
+        height="450px"
+      />
+      
+      {/* Gráficos */}
+      <div className="charts-grid">
+        <EnhancedChart 
+          type="pie"
+          data={chartData.byDisease}
+          title="Animales Afectados por Enfermedad"
+        />
+        
+        <EnhancedChart 
+          type="pie"
+          data={chartData.byStatus}
+          title="Distribución por Estado"
+        />
+        
+        <EnhancedChart 
+          type="bar"
+          data={chartData.byRegion}
+          title="Animales Afectados por Región"
+          xAxisLabel="Región"
+          yAxisLabel="Animales"
+        />
+        
+        <EnhancedChart 
+          type="pie"
+          data={chartData.bySeverity}
+          title="Distribución por Severidad"
+        />
+      </div>
+      
+      {/* Gráfico de evolución para brotes activos */}
+      {chartData.progressData.length > 0 && (
+        <div className="outbreak-evolution">
+          <h3>Evolución de Brotes Activos</h3>
+          <EnhancedChart 
+            type="line"
+            data={chartData.progressData}
+            dataKey="value"
+            nameKey="date"
+            xAxisLabel="Fecha"
+            yAxisLabel="Casos"
+            height={300}
           />
         </div>
-        
-        <div className="charts-section">
-          <div className="chart-row">
-            <Chart 
-              type="pie"
-              data={chartData.byDisease}
-              title="Animales Afectados por Enfermedad"
-            />
-            <Chart 
-              type="pie"
-              data={chartData.byStatus}
-              title="Distribución por Estado"
-            />
-          </div>
-        </div>
-      </div>
+      )}
       
       <div className="outbreaks-list">
         <h3>Listado de Brotes</h3>
@@ -303,6 +360,25 @@ const OutbreaksView = () => {
             
             <div className="details-section">
               <h4>Evolución del Brote</h4>
+              
+              {/* Gráfico de evolución */}
+              <div className="outbreak-progress-chart">
+                <EnhancedChart 
+                  type="line"
+                  data={selectedOutbreak.progress.map(entry => ({
+                    date: entry.date,
+                    "Nuevos Casos": entry.newCases,
+                    "Total Casos": entry.totalCases
+                  }))}
+                  dataKey="Total Casos"
+                  secondaryDataKey="Nuevos Casos"
+                  nameKey="date"
+                  xAxisLabel="Fecha"
+                  yAxisLabel="Casos"
+                  height={250}
+                />
+              </div>
+              
               <table className="progress-table">
                 <thead>
                   <tr>

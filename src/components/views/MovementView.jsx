@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import EnhancedMap from '../common/EnhancedMap';
+import EnhancedChart from '../common/EnhancedChart';
 import DataTable from '../common/DataTable';
-import Map from '../common/Map';
-import Chart from '../common/Chart';
 import { movementsData } from '../../data/mockData';
 
 const MovementView = () => {
@@ -64,6 +64,7 @@ const MovementView = () => {
     { header: 'Cantidad', accessor: 'animalCount' },
     { header: 'Tipo Animal', accessor: 'animalType' },
     { header: 'Propósito', accessor: 'purpose' },
+    { header: 'Documento', accessor: 'documentNumber' },
     { 
       header: 'Alerta', 
       accessor: 'hasAlert', 
@@ -84,7 +85,10 @@ const MovementView = () => {
             title: `${movement.type === 'import' ? 'Origen' : 'Salida'}: ${movement.country}`,
             description: `${movement.animalCount} ${movement.animalType}`,
             coordinates: movement.coordinates.origin,
-            type: 'origin'
+            type: 'origin',
+            movementId: movement.id,
+            hasAlert: movement.hasAlert,
+            alertReason: movement.alertReason
           });
         }
         
@@ -95,7 +99,10 @@ const MovementView = () => {
             title: `${movement.type === 'import' ? 'Destino' : 'Destino'}: ${movement.type === 'import' ? movement.destination : movement.country}`,
             description: `${movement.animalCount} ${movement.animalType}`,
             coordinates: movement.coordinates.destination,
-            type: 'destination'
+            type: 'destination',
+            movementId: movement.id,
+            hasAlert: movement.hasAlert,
+            alertReason: movement.alertReason
           });
         }
       }
@@ -106,7 +113,7 @@ const MovementView = () => {
   
   // Preparar datos para gráficos
   const getChartData = () => {
-    // Datos por país
+    // Datos agrupados por país
     const byCountry = filteredData.reduce((acc, curr) => {
       const country = curr.country;
       if (!acc[country]) acc[country] = { imports: 0, exports: 0 };
@@ -120,11 +127,30 @@ const MovementView = () => {
       return acc;
     }, {});
     
+    // Datos agrupados por propósito
+    const byPurpose = filteredData.reduce((acc, curr) => {
+      const purpose = curr.purpose;
+      if (!acc[purpose]) acc[purpose] = 0;
+      acc[purpose] += curr.animalCount;
+      return acc;
+    }, {});
+    
+    // Datos agregados por tipo de movimiento
+    const byMovementType = [
+      { name: 'Importaciones', value: filteredData.filter(m => m.type === 'import').reduce((sum, curr) => sum + curr.animalCount, 0) },
+      { name: 'Exportaciones', value: filteredData.filter(m => m.type === 'export').reduce((sum, curr) => sum + curr.animalCount, 0) }
+    ];
+    
     // Convertir a formato para gráficos
-    return Object.entries(byCountry).map(([name, values]) => ({
-      name,
-      value: values.imports + values.exports
-    }));
+    return {
+      byCountry: Object.entries(byCountry).map(([name, values]) => ({
+        name,
+        imports: values.imports,
+        exports: values.exports
+      })),
+      byPurpose: Object.entries(byPurpose).map(([name, value]) => ({ name, value })),
+      byMovementType
+    };
   };
   
   // Manejador de cambio de filtros
@@ -223,6 +249,26 @@ const MovementView = () => {
         </div>
       </div>
       
+      {/* Estadísticas rápidas */}
+      <div className="stats-summary">
+        <div className="summary-box">
+          <span className="summary-label">Total Movimientos</span>
+          <span className="summary-value">{filteredData.length}</span>
+        </div>
+        <div className="summary-box">
+          <span className="summary-label">Importaciones</span>
+          <span className="summary-value">{filteredData.filter(m => m.type === 'import').length}</span>
+        </div>
+        <div className="summary-box">
+          <span className="summary-label">Exportaciones</span>
+          <span className="summary-value">{filteredData.filter(m => m.type === 'export').length}</span>
+        </div>
+        <div className="summary-box">
+          <span className="summary-label">Total Animales</span>
+          <span className="summary-value">{filteredData.reduce((sum, curr) => sum + curr.animalCount, 0)}</span>
+        </div>
+      </div>
+      
       {/* Alerta si hay movimientos con alerta */}
       {filters.hasAlert && filteredData.some(m => m.hasAlert) && (
         <div className="alerts-panel">
@@ -231,7 +277,7 @@ const MovementView = () => {
             {filteredData
               .filter(m => m.hasAlert)
               .map(movement => (
-                <li key={movement.id}>
+                <li key={movement.id} onClick={() => setSelectedMovement(movement)}>
                   <strong>{movement.documentNumber} - {movement.country}</strong>: {movement.alertReason}
                 </li>
               ))
@@ -271,18 +317,39 @@ const MovementView = () => {
         )}
         
         {activeTab === 'map' && (
-          <Map 
+          <EnhancedMap 
             markers={getMapMarkers()} 
             title="Mapa de Movimientos de Ganado"
+            center={[4.570868, -74.297333]} 
+            zoom={5}
           />
         )}
         
         {activeTab === 'chart' && (
-          <Chart 
-            type="pie"
-            data={getChartData()}
-            title="Movimientos por País (Total Animales)"
-          />
+          <div className="charts-grid">
+            <EnhancedChart 
+              type="pie"
+              data={getChartData().byMovementType}
+              title="Distribución por Tipo de Movimiento"
+              height={350}
+            />
+            
+            <EnhancedChart 
+              type="stackedBar"
+              data={getChartData().byCountry}
+              title="Movimientos por País"
+              xAxisLabel="País"
+              yAxisLabel="Cantidad de Animales"
+              height={350}
+            />
+            
+            <EnhancedChart 
+              type="pie"
+              data={getChartData().byPurpose}
+              title="Distribución por Propósito"
+              height={350}
+            />
+          </div>
         )}
       </div>
       
@@ -338,6 +405,11 @@ const MovementView = () => {
               <div className="alert-section">
                 <h4>Información de Alerta</h4>
                 <p>{selectedMovement.alertReason}</p>
+                
+                <div className="alert-actions">
+                  <button className="btn-secondary">Revisar Documentación</button>
+                  <button className="btn-primary">Marcar como Revisado</button>
+                </div>
               </div>
             )}
           </div>

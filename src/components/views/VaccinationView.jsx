@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import EnhancedMap from '../common/EnhancedMap';
+import EnhancedChart from '../common/EnhancedChart';
 import DataTable from '../common/DataTable';
-import Map from '../common/Map';
-import Chart from '../common/Chart';
 import { vaccinationsData } from '../../data/mockData';
 
 const VaccinationView = () => {
@@ -25,7 +25,7 @@ const VaccinationView = () => {
       if (filters.campaign && vaccination.campaign !== filters.campaign) return false;
       
       // Filtro por vacunador
-      if (filters.vaccinator && !vaccination.vaccinatorName.toLowerCase().includes(filters.vaccinator.toLowerCase())) 
+      if (filters.vaccinator && vaccination.vaccinatorId !== filters.vaccinator) 
         return false;
       
       // Filtro por fecha inicio
@@ -67,7 +67,11 @@ const VaccinationView = () => {
   // Obtener listas únicas para los filtros
   const regions = [...new Set(vaccinationsData.map(v => v.region))];
   const campaigns = [...new Set(vaccinationsData.map(v => v.campaign))];
-  const vaccinators = [...new Set(vaccinationsData.map(v => v.vaccinatorName))];
+  const vaccinators = [...new Set(vaccinationsData.map(v => v.vaccinatorId))];
+  const vaccinatorNames = vaccinationsData.reduce((acc, curr) => {
+    acc[curr.vaccinatorId] = curr.vaccinatorName;
+    return acc;
+  }, {});
   
   // Manejador de cambio de filtros
   const handleFilterChange = (name, value) => {
@@ -93,7 +97,7 @@ const VaccinationView = () => {
     return filteredData.map(vaccination => ({
       id: vaccination.id,
       title: vaccination.farm,
-      description: `${vaccination.animalsVaccinated} animales vacunados`,
+      description: `${vaccination.animalsVaccinated} animales vacunados (${vaccination.vaccineType})`,
       coordinates: vaccination.coordinates
     }));
   };
@@ -116,9 +120,48 @@ const VaccinationView = () => {
       return acc;
     }, {});
     
+    // Datos por vacunador
+    const byVaccinator = filteredData.reduce((acc, curr) => {
+      const vaccinatorName = curr.vaccinatorName;
+      if (!acc[vaccinatorName]) acc[vaccinatorName] = 0;
+      acc[vaccinatorName] += curr.animalsVaccinated;
+      return acc;
+    }, {});
+    
+    // Datos por género
+    const byGender = [
+      { name: 'Machos', value: filteredData.reduce((sum, curr) => sum + curr.maleCount, 0) },
+      { name: 'Hembras', value: filteredData.reduce((sum, curr) => sum + curr.femaleCount, 0) }
+    ];
+    
+    // Datos por edad
+    const byAge = [
+      { name: 'Jóvenes', value: filteredData.reduce((sum, curr) => sum + curr.youngCount, 0) },
+      { name: 'Adultos', value: filteredData.reduce((sum, curr) => sum + curr.adultCount, 0) }
+    ];
+    
+    // Datos por fecha (para ver tendencia)
+    const byDate = {};
+    filteredData.forEach(vaccination => {
+      const date = new Date(vaccination.dateCreated).toLocaleDateString();
+      if (!byDate[date]) byDate[date] = 0;
+      byDate[date] += vaccination.animalsVaccinated;
+    });
+    
+    // Ordenar por fecha
+    const sortedDates = Object.keys(byDate).sort((a, b) => new Date(a) - new Date(b));
+    const byDateArray = sortedDates.map(date => ({
+      name: date,
+      value: byDate[date]
+    }));
+    
     return {
       byRegion: Object.entries(byRegion).map(([name, value]) => ({ name, value })),
-      byVaccineType: Object.entries(byVaccineType).map(([name, value]) => ({ name, value }))
+      byVaccineType: Object.entries(byVaccineType).map(([name, value]) => ({ name, value })),
+      byVaccinator: Object.entries(byVaccinator).map(([name, value]) => ({ name, value })),
+      byGender,
+      byAge,
+      byDate: byDateArray
     };
   };
   
@@ -189,8 +232,10 @@ const VaccinationView = () => {
                 onChange={(e) => handleFilterChange('vaccinator', e.target.value)}
               >
                 <option value="">Todos</option>
-                {vaccinators.map(vaccinator => (
-                  <option key={vaccinator} value={vaccinator}>{vaccinator}</option>
+                {vaccinators.map(vaccinatorId => (
+                  <option key={vaccinatorId} value={vaccinatorId}>
+                    {vaccinatorNames[vaccinatorId]}
+                  </option>
                 ))}
               </select>
             </div>
@@ -272,26 +317,73 @@ const VaccinationView = () => {
         )}
         
         {activeTab === 'map' && (
-          <Map 
+          <EnhancedMap 
             markers={getMapMarkers()} 
             title="Ubicación de Jornadas de Vacunación"
+            center={[4.570868, -74.297333]}
+            zoom={6}
           />
         )}
         
         {activeTab === 'chart' && (
           <div className="charts-container">
-            <div className="chart-row">
-              <Chart 
+            {/* Primera fila de gráficos */}
+            <div className="charts-grid">
+              <EnhancedChart 
                 type="bar"
                 data={chartData.byRegion}
                 title="Animales Vacunados por Región"
+                xAxisLabel="Región"
+                yAxisLabel="Animales"
               />
-              <Chart 
+              
+              <EnhancedChart 
                 type="pie"
                 data={chartData.byVaccineType}
                 title="Distribución por Tipo de Vacuna"
               />
             </div>
+            
+            {/* Segunda fila de gráficos */}
+            <div className="charts-grid">
+              <EnhancedChart 
+                type="pie"
+                data={chartData.byGender}
+                title="Distribución por Género"
+              />
+              
+              <EnhancedChart 
+                type="pie"
+                data={chartData.byAge}
+                title="Distribución por Edad"
+              />
+            </div>
+            
+            {/* Gráfico de tendencia */}
+            {chartData.byDate.length > 1 && (
+              <div className="trend-chart">
+                <EnhancedChart 
+                  type="line"
+                  data={chartData.byDate}
+                  title="Tendencia de Vacunación"
+                  xAxisLabel="Fecha"
+                  yAxisLabel="Animales Vacunados"
+                  height={300}
+                />
+              </div>
+            )}
+            
+            {/* Desempeño por vacunador */}
+            {chartData.byVaccinator.length > 0 && (
+              <EnhancedChart 
+                type="bar"
+                data={chartData.byVaccinator}
+                title="Animales Vacunados por Técnico"
+                xAxisLabel="Vacunador"
+                yAxisLabel="Animales"
+                height={300}
+              />
+            )}
           </div>
         )}
       </div>
@@ -332,6 +424,34 @@ const VaccinationView = () => {
             
             <div className="details-section">
               <h4>Conteo de Animales</h4>
+              
+              {/* Gráfico de distribución */}
+              <div className="distribution-charts">
+                <div className="chart-row">
+                  <EnhancedChart 
+                    type="pie"
+                    data={[
+                      { name: 'Machos', value: selectedVaccination.maleCount },
+                      { name: 'Hembras', value: selectedVaccination.femaleCount }
+                    ]}
+                    title="Distribución por Género"
+                    height={200}
+                    className="small-chart"
+                  />
+                  
+                  <EnhancedChart 
+                    type="pie"
+                    data={[
+                      { name: 'Jóvenes', value: selectedVaccination.youngCount },
+                      { name: 'Adultos', value: selectedVaccination.adultCount }
+                    ]}
+                    title="Distribución por Edad"
+                    height={200}
+                    className="small-chart"
+                  />
+                </div>
+              </div>
+              
               <div className="details-row">
                 <span className="label">Total Vacunados:</span>
                 <span className="value">{selectedVaccination.animalsVaccinated}</span>
