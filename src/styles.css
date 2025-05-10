@@ -1,0 +1,859 @@
+/* Variables y configuración general */
+:root {
+    --primary-color: #0e6a37;
+    --primary-light: #4b8b6b;
+    --primary-dark: #084a27;
+    --secondary-color: #ffc107;
+    --text-color: #333333;
+    --text-light: #666666;
+    --background-color: #f8f9fa;
+    --border-color: #e0e0e0;
+    --error-color: #dc3545;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --white: #ffffff;
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-300: #dee2e6;
+    --gray-400: #ced4da;
+    --gray-500: #adb5bd;
+    --gray-600: #6c757d;
+    --gray-700: #495057;
+    --gray-800: #343a40;
+    --gray-900: #212529;
+  }
+  
+  /* Reset y estilos generales */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 1rem;
+    color: var(--primary-dark);
+  }
+  
+  a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+  
+  button:hover {
+    opacity: 0.9;
+  }
+  
+  button.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+  }
+  
+  input, select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--white);
+  }
+  
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+  
+  /* Layout principal */
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  .footer {
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    background-color: var(--gray-200);
+    color: var(--gray-600);
+    font-size: 0.875rem;
+  }
+  
+  /* Navbar */
+  .navbar {
+    background-color: var(--white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .logo {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .logo h1 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.75rem;
+  }
+  
+  .logo span {
+    font-size: 0.875rem;
+    color: var(--text-light);
+  }
+  
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+  }
+  
+  .nav-links a {
+    color: var(--text-color);
+    font-weight: 500;
+    padding: 0.5rem 0;
+    position: relative;
+  }
+  
+  .nav-links a.active {
+    color: var(--primary-color);
+  }
+  
+  .nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .user-name {
+    font-weight: 500;
+  }
+  
+  .logout-btn {
+    background-color: var(--gray-200);
+    color: var(--text-color);
+  }
+  
+  /* Componentes comunes */
+  .view-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .view-header h2 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .description {
+    color: var(--text-light);
+  }
+  
+  .filters-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .filters-container {
+    background-color: var(--gray-100);
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--gray-300);
+  }
+  
+  .filter-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+  
+  .filter-row:last-child {
+    margin-bottom: 0;
+  }
+  
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 150px;
+    flex: 1;
+  }
+  
+  .filter-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .filter-group.checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .filter-group.checkbox input {
+    width: auto;
+  }
+  
+  .reset-btn {
+    background-color: var(--gray-200);
+    color: var(--gray-700);
+    margin-left: auto;
+    align-self: flex-end;
+  }
+  
+  /* Summary/Stats boxes */
+  .vaccination-summary,
+  .outbreak-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .summary-item {
+    background-color: var(--white);
+    padding: 1rem;
+    border-radius: 4px;
+    flex: 1;
+    min-width: 150px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .summary-label {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+  }
+  
+  .summary-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  
+  /* Tabs */
+  .view-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+  }
+  
+  .view-tabs button {
+    background-color: var(--gray-200);
+    color: var(--text-color);
+    font-weight: 500;
+  }
+  
+  .view-tabs button.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+  }
+  
+  /* Detalles panel */
+  .details-panel {
+    background-color: var(--white);
+    margin-top: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .details-header {
+    background-color: var(--primary-light);
+    color: var(--white);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .details-header h3 {
+    margin: 0;
+    color: var(--white);
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 1.5rem;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.8;
+  }
+  
+  .details-content {
+    padding: 1.5rem;
+  }
+  
+  .details-row {
+    display: flex;
+    margin-bottom: 0.75rem;
+  }
+  
+  .details-row .label {
+    font-weight: 500;
+    width: 150px;
+    color: var(--gray-700);
+  }
+  
+  .details-row .value {
+    flex: 1;
+  }
+  
+  .details-section {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-300);
+  }
+  
+  .details-section h4 {
+    margin-bottom: 0.75rem;
+    color: var(--primary-dark);
+  }
+  
+  .details-status {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .status-badge, .severity-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .status-badge.active {
+    background-color: #ffebee;
+    color: #d32f2f;
+  }
+  
+  .status-badge.controlled {
+    background-color: #fff8e1;
+    color: #ff8f00;
+  }
+  
+  .status-badge.eradicated {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+  
+  .severity-badge.alta {
+    background-color: #ffebee;
+    color: #d32f2f;
+  }
+  
+  .severity-badge.media {
+    background-color: #fff8e1;
+    color: #ff8f00;
+  }
+  
+  .severity-badge.baja {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+  
+  .details-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+  }
+  
+  .primary-btn {
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-weight: 500;
+  }
+  
+  .secondary-btn {
+    background-color: var(--white);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+  }
+  
+  .alert-section {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #fff8e1;
+    border-radius: 4px;
+    border-left: 3px solid #ff8f00;
+  }
+  
+  .alert-section h4 {
+    color: #ff8f00;
+    margin-bottom: 0.5rem;
+  }
+  
+  .alerts-panel {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #fff8e1;
+    border-radius: 4px;
+    border-left: 3px solid #ff8f00;
+  }
+  
+  .alerts-panel h3 {
+    color: #ff8f00;
+    margin-bottom: 0.5rem;
+  }
+  
+  .alerts-panel ul {
+    padding-left: 1.5rem;
+  }
+  
+  .alerts-panel li {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* DataTable */
+  .data-table-container {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .data-table th, .data-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-300);
+  }
+  
+  .data-table th {
+    background-color: var(--gray-100);
+    font-weight: 600;
+    color: var(--gray-700);
+  }
+  
+  .data-table tbody tr:hover {
+    background-color: var(--gray-100);
+  }
+  
+  .clickable-row {
+    cursor: pointer;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .pagination button {
+    background-color: var(--gray-200);
+    color: var(--text-color);
+  }
+  
+  .pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* Tablas dentro de paneles de detalle */
+  .progress-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+  }
+  
+  .progress-table th, .progress-table td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-300);
+  }
+  
+  .progress-table th {
+    background-color: var(--gray-100);
+    font-weight: 500;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+  }
+  
+  /* Outbreaks list table */
+  .outbreaks-list {
+    margin-top: 1.5rem;
+  }
+  
+  .outbreaks-list h3 {
+    margin-bottom: 0.75rem;
+  }
+  
+  .outbreaks-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .outbreaks-table th, .outbreaks-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-300);
+  }
+  
+  .outbreaks-table th {
+    background-color: var(--gray-100);
+    font-weight: 600;
+    color: var(--gray-700);
+  }
+  
+  .view-details-btn {
+    background-color: var(--primary-light);
+    color: var(--white);
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  /* Mapa simulado */
+  .map-container {
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    background-color: var(--white);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  
+  .map-container h3 {
+    padding: 0.75rem 1rem;
+    background-color: var(--gray-100);
+    margin: 0;
+    border-bottom: 1px solid var(--gray-300);
+  }
+  
+  .map-simulation {
+    height: 400px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .map-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e8f4f8; /* Color azul claro para simular agua */
+  }
+  
+  .colombia-outline {
+    position: absolute;
+    width: 70%;
+    height: 80%;
+    top: 10%;
+    left: 15%;
+    background-color: #c3e6cb; /* Color verde claro para tierra */
+    clip-path: polygon(
+      50% 0%, 
+      80% 20%, 
+      90% 40%, 
+      80% 70%, 
+      70% 90%, 
+      50% 100%, 
+      30% 90%, 
+      20% 70%, 
+      10% 40%, 
+      20% 20%
+    ); /* Forma aproximada de Colombia */
+  }
+  
+  .map-marker {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    transform: translate(-50%, -50%);
+  }
+  
+  .marker-dot {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    border: 2px solid var(--white);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  .map-marker.outbreak .marker-dot {
+    background-color: #ff5252;
+  }
+  
+  .map-marker.active .marker-dot {
+    background-color: #ff5252;
+  }
+  
+  .map-marker.controlled .marker-dot {
+    background-color: #ffaa00;
+  }
+  
+  .map-marker.eradicated .marker-dot {
+    background-color: #66bb6a;
+  }
+  
+  .map-marker.origin .marker-dot {
+    background-color: #7986cb;
+  }
+  
+  .map-marker.destination .marker-dot {
+    background-color: #4fc3f7;
+  }
+  
+  .map-legend {
+    padding: 0.75rem 1rem;
+    display: flex;
+    gap: 1.5rem;
+    border-top: 1px solid var(--gray-300);
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  
+  .legend-dot.active {
+    background-color: #ff5252;
+  }
+  
+  .legend-dot.controlled {
+    background-color: #ffaa00;
+  }
+  
+  .legend-dot.eradicated {
+    background-color: #66bb6a;
+  }
+  
+  /* Simulación de gráficos */
+  .chart-container {
+    background-color: var(--white);
+    border-radius: 4px;
+    border: 1px solid var(--gray-300);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-container h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+  
+  .chart-content {
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 40px;
+    position: relative;
+  }
+  
+  .bar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    height: 100%;
+    padding: 0 5px;
+  }
+  
+  .bar {
+    width: 100%;
+    max-width: 50px;
+    background-color: var(--primary-color);
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s ease;
+  }
+  
+  .bar-label {
+    position: absolute;
+    bottom: 10px;
+    font-size: 0.8rem;
+    text-align: center;
+    color: var(--gray-700);
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .chart-pie {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+  
+  .pie-container {
+    width: 220px;
+    height: 220px;
+    flex-shrink: 0;
+  }
+  
+  .pie-simulation {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .pie-segment {
+    position: absolute;
+  }
+  
+  .pie-legend {
+    flex: 1;
+    padding-left: 2rem;
+  }
+  
+  .color-box {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+  }
+  
+  .charts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .chart-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .chart-row .chart-container {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  /* Outbreak view */
+  .outbreak-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .map-section {
+    flex: 1;
+  }
+  
+  .charts-section {
+    flex: 1;
+  }
+  
+  @media (min-width: 992px) {
+    .outbreak-main {
+      flex-direction: row;
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      padding: 1rem;
+    }
+    
+    .logo {
+      margin-bottom: 1rem;
+    }
+    
+    .nav-links {
+      margin-bottom: 1rem;
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .filter-group {
+      min-width: 100%;
+    }
+    
+    .details-row {
+      flex-direction: column;
+    }
+    
+    .details-row .label {
+      width: 100%;
+      margin-bottom: 0.25rem;
+    }
+  }
