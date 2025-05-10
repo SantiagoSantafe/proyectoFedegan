@@ -1,4 +1,4 @@
-// components/common/EnhancedChart.js - Con correcciones aplicadas
+// components/common/EnhancedChart.js - Con correcciones aplicadass
 import React from 'react';
 import {
   BarChart, Bar,
