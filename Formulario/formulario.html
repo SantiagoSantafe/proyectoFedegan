@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario de Vacunación</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      padding: 1rem;
+      margin: 0;
+    }
+
+    .form-container {
+      max-width: 768px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    .inline {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .inline input[type="checkbox"] {
+      width: auto;
+    }
+
+    button {
+      margin-top: 2rem;
+      padding: 1rem;
+      width: 100%;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .add-btn {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .add-btn:hover {
+      background-color: #0056b3;
+    }
+
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 1.2rem;
+      }
+      input, select, textarea, button {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body onload="cargarNombreVacunador()">
+  <div class="form-container">
+    <h2>Formulario Registro de Vacunadores</h2>
+    
+    <label>Vacunador</label>
+    <input type="text" id="vacunador" readonly>
+
+    <label>Nombre de la campaña</label>
+    <input type="text" id="campania">
+
+    <div class="inline">
+      <input type="checkbox" id="finalizada">
+      <label for="finalizada">¿Campaña finalizada?</label>
+    </div>
+
+    <label for="totalMachos">Total de machos:</label>
+    <input type="number" id="totalMachos" name="totalMachos" min="0" required>
+               
+    <label for="totalHembras">Total de hembras:</label>
+    <input type="number" id="totalHembras" name="totalHembras" min="0" required>
+
+    <label for="totalAnimales">Total de animales:</label>
+    <input type="number" id="totalAnimales" name="totalAnimales" readonly>
+  
+    <label>Animales vacunados</label>
+    <input type="number" id="vacunados" min="0">
+
+    <label>Animales enfermos</label>
+    <input type="number" id="enfermos" min="0">
+
+    <label>Enfermedades detectadas</label>
+    <div id="enfermedades">
+      <select name="enfermedad">
+        <option>Fiebre aftosa</option>
+        <option>Brucelosis</option>
+        <option>Rabia</option>
+        <option>Carbunco</option>
+        <option>Leptospirosis</option>
+      </select>
+    </div>
+    <button class="add-btn" type="button" onclick="agregarEnfermedad()">+ Agregar enfermedad</button>
+
+    <label>Vacunas aplicadas</label>
+    <div id="vacunas">
+      <select name="vacuna">
+        <option>Vacuna Aftosa</option>
+        <option>Vacuna Brucela</option>
+        <option>Vacuna Rabia</option>
+        <option>Vacuna Carbunco</option>
+        <option>Vacuna Lepto</option>
+      </select>
+    </div>
+    <button class="add-btn" type="button" onclick="agregarVacuna()">+ Agregar vacuna</button>
+
+    <label>Fecha y hora</label>
+    <input type="datetime-local" id="fechaHora">
+
+    <label>Ubicación geográfica</label>
+    <input type="text" id="ubicacion">
+
+    <label>Nombre de la finca</label>
+    <input type="text" id="finca">
+
+    <label>Observaciones</label>
+    <textarea id="observaciones" rows="3"></textarea>
+
+    <button onclick="guardarFormulario()">Guardar</button>
+  </div>
+
+  <script>
+    function cargarNombreVacunador() {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActual')) || { nombre: "NaN" };
+      document.getElementById('vacunador').value = usuario.nombre || "NaN";
+    }
+
+    function agregarEnfermedad() {
+      const contenedor = document.getElementById('enfermedades');
+      const nuevo = document.createElement('select');
+      nuevo.name = "enfermedad";
+      nuevo.innerHTML = `
+        <option>Fiebre aftosa</option>
+        <option>Brucelosis</option>
+        <option>Rabia</option>
+        <option>Carbunco</option>
+        <option>Leptospirosis</option>
+      `;
+      contenedor.appendChild(nuevo);
+    }
+
+    function agregarVacuna() {
+      const contenedor = document.getElementById('vacunas');
+      const nuevo = document.createElement('select');
+      nuevo.name = "vacuna";
+      nuevo.innerHTML = `
+        <option>Vacuna Aftosa</option>
+        <option>Vacuna Brucela</option>
+        <option>Vacuna Rabia</option>
+        <option>Vacuna Carbunco</option>
+        <option>Vacuna Lepto</option>
+      `;
+      contenedor.appendChild(nuevo);
+    }
+
+    document.getElementById("totalMachos").addEventListener("input", actualizarTotalAnimales);
+    document.getElementById("totalHembras").addEventListener("input", actualizarTotalAnimales);
+
+    function actualizarTotalAnimales() {
+        const machos = parseInt(document.getElementById("totalMachos").value) || 0;
+        const hembras = parseInt(document.getElementById("totalHembras").value) || 0;
+        document.getElementById("totalAnimales").value = machos + hembras;
+    }
+
+
+    function guardarFormulario() {
+      const data = {
+        vacunador: document.getElementById('vacunador').value,
+        campania: document.getElementById('campania').value,
+        finalizada: document.getElementById('finalizada').checked,
+        vacunados: parseInt(document.getElementById('vacunados').value) || 0,
+        enfermos: parseInt(document.getElementById('enfermos').value) || 0,
+        total_machos: parseInt(document.getElementById('totalMachos').value) || 0,
+        total_hembras: parseInt(document.getElementById('totalHembras').value) || 0,
+        total_animales: parseInt(document.getElementById('totalAnimales').value) || 0,
+        enfermedades: Array.from(document.getElementsByName('enfermedad')).map(e => e.value),
+        vacunas: Array.from(document.getElementsByName('vacuna')).map(e => e.value),
+        fechaHora: document.getElementById('fechaHora').value,
+        ubicacion: document.getElementById('ubicacion').value,
+        finca: document.getElementById('finca').value,
+        observaciones: document.getElementById('observaciones').value
+      };
+
+      let registros = JSON.parse(localStorage.getItem('registrosVacunacion')) || [];
+      registros.push(data);
+      localStorage.setItem('registrosVacunacion', JSON.stringify(registros));
+
+      alert("Formulario guardado correctamente.");
+      limpiarFormulario();
+    }
+
+    function limpiarFormulario() {
+  document.getElementById("campania").value = "";
+  document.getElementById("finalizada").checked = false;
+  document.getElementById("vacunados").value = "";
+  document.getElementById("enfermos").value = "";
+  document.getElementById("totalMachos").value = "";
+  document.getElementById("totalHembras").value = "";
+  document.getElementById("totalAnimales").value = "";
+  document.getElementById("fechaHora").value = "";
+  document.getElementById("ubicacion").value = "";
+  document.getElementById("finca").value = "";
+  document.getElementById("observaciones").value = "";
+
+  // Solo deja una enfermedad y una vacuna
+  const enfermedades = document.getElementById("enfermedades");
+  enfermedades.innerHTML = `<select name="enfermedad">
+    <option>Fiebre aftosa</option>
+    <option>Brucelosis</option>
+    <option>Rabia</option>
+    <option>Carbunco</option>
+    <option>Leptospirosis</option>
+  </select>`;
+
+  const vacunas = document.getElementById("vacunas");
+  vacunas.innerHTML = `<select name="vacuna">
+    <option>Vacuna Aftosa</option>
+    <option>Vacuna Brucela</option>
+    <option>Vacuna Rabia</option>
+    <option>Vacuna Carbunco</option>
+    <option>Vacuna Lepto</option>
+  </select>`;
+}
+
+
+  </script>
+</body>
+</html>
