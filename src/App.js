@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import MovementView from './components/views/MovementView';
 import OutbreaksView from './components/views/OutbreaksView';
@@ -7,6 +8,8 @@ import VaccinationView from './components/views/VaccinationView';
 import './styles.css';
 
 function App() {
+  // Usando HashRouter en lugar de BrowserRouter para mejor compatibilidad con GitHub Pages
+  // HashRouter usa URLs con hash (#) que funcionan sin configuración del servidor
   return (
     <Router>
       <Routes>
