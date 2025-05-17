@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/proyectoFedegan/static/css/main.5f035680.css",
-    "main.js": "/proyectoFedegan/static/js/main.848bcd86.js",
+    "main.css": "/proyectoFedegan/static/css/main.3b52c2e1.css",
+    "main.js": "/proyectoFedegan/static/js/main.0d059e54.js",
     "static/js/453.948b67a0.chunk.js": "/proyectoFedegan/static/js/453.948b67a0.chunk.js",
     "index.html": "/proyectoFedegan/index.html",
-    "main.5f035680.css.map": "/proyectoFedegan/static/css/main.5f035680.css.map",
-    "main.848bcd86.js.map": "/proyectoFedegan/static/js/main.848bcd86.js.map",
+    "main.3b52c2e1.css.map": "/proyectoFedegan/static/css/main.3b52c2e1.css.map",
+    "main.0d059e54.js.map": "/proyectoFedegan/static/js/main.0d059e54.js.map",
     "453.948b67a0.chunk.js.map": "/proyectoFedegan/static/js/453.948b67a0.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5f035680.css",
-    "static/js/main.848bcd86.js"
+    "static/css/main.3b52c2e1.css",
+    "static/js/main.0d059e54.js"
   ]
 }
