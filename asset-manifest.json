@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/proyectoFedegan/static/css/main.5f035680.css",
-    "main.js": "/proyectoFedegan/static/js/main.45bdf331.js",
+    "main.js": "/proyectoFedegan/static/js/main.848bcd86.js",
     "static/js/453.948b67a0.chunk.js": "/proyectoFedegan/static/js/453.948b67a0.chunk.js",
     "index.html": "/proyectoFedegan/index.html",
     "main.5f035680.css.map": "/proyectoFedegan/static/css/main.5f035680.css.map",
-    "main.45bdf331.js.map": "/proyectoFedegan/static/js/main.45bdf331.js.map",
+    "main.848bcd86.js.map": "/proyectoFedegan/static/js/main.848bcd86.js.map",
     "453.948b67a0.chunk.js.map": "/proyectoFedegan/static/js/453.948b67a0.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5f035680.css",
-    "static/js/main.45bdf331.js"
+    "static/js/main.848bcd86.js"
   ]
 }
